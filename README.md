@@ -1,6 +1,11 @@
 It will simulate a simple railway monitoring system that allows a user to:
 
 1. Register trains.
+- module add trains(done)
+-save the added trains(in progress)
+-retrieve the saved trains(in progress)
+-view saved trains(in progress)
+-delet a train detail(in progress)
 2. Monitor track occupancy.
 3. Display signal status (RED or GREEN).
 4. Detect occupied tracks.
