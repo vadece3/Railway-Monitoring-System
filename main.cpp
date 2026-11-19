@@ -1,8 +1,8 @@
 
 #include <iostream>
 #include <string>
-#include "control/Service.cpp"
-#include "control/Train.cpp"
+#include "control/Service.h"
+#include "control/Train.h"
 
 int main()
 {
@@ -20,20 +20,23 @@ int main()
     std::cout << "Service List:\n";
     std::cout << "====================================\n";
     Service selectOptiog;
+    Train trainService;
     int mainChecker = 0;
 
     do
     {
         std::string selectedService = selectOptiog.selectService();
 
-        if (selectedService == "A")
+        if (selectedService == "T")
         {
-            Train addTrain;
-            addTrain.enterNewTrainDetails();
+            std::string* trainResult = trainService.trainServiceOption();
+            if(*trainResult == "exit"){
+                continue;
+            }
         }
         else if (selectedService == "exit")
         {
-            int mainChecker = 1;
+            mainChecker = 1;
             break;
         }
 

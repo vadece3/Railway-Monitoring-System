@@ -1,0 +1,10 @@
+trains:
+  - id: T001
+    name: ICE Berlin
+    destination: Berlin
+  - id: T002
+    name: ICE Hamburg
+    destination: Hamburg
+  - id: Td n
+    name: Df c
+    destination: Hs f

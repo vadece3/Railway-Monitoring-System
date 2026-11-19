@@ -6,14 +6,14 @@ std::string Service::selectService(){
    
     Service::selectedService;
     int checker = 0;
-    std::string const cars[2] = {"A","exit"};//enter the letters which will be checked after user has enterd the letter
+    std::string const serviceOptions[2] = {"T","exit"};//enter the letters which will be checked after user has enterd the letter
     do
     {
-        std::cout << "\n\n***Please enter a letter from the list of enter \"exit\" to end.***\n\n";
+        std::cout << "\n\n***Please enter a letter from the list and enter \"exit\" to end.***\n\n";
         Service::selectedService = getSelectedService();
-        for (int i = 0; i <  sizeof(cars) / sizeof(cars[0]); i++)
+        for (int i = 0; i <  sizeof(serviceOptions) / sizeof(serviceOptions[0]); i++)
             {
-                if(selectedService == cars[i]){
+                if(selectedService == serviceOptions[i]){
                     checker = 1;
                     break;
                 }
@@ -30,7 +30,8 @@ std::string Service::getSelectedService(){
     std::cout << "Select the service you want to use by entering the coresponding letter: \n\n";
     
     // Enter and Print Train information
-    std::cout << "1. Enter New Train And Print Train List (Enter letter A) \n\n";
+    std::cout << "1. Train Settings (Enter letter T) \n\n";
+    std::cout << "->";
 
     std::cin >> enteredValue;
 
