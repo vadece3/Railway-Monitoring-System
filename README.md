@@ -59,6 +59,8 @@ Select the service you want to use by entering the coresponding letter:
                                    
                                       4. Delete Train (Enter letter D)
 
+                                      5. Search for a particular train (Enter letter S)
+
 
 2. Occupy a track
 3. Release a track
