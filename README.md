@@ -23,8 +23,11 @@ Enter your terminal and run the command:
 git clone https://github.com/microsoft/vcpkg.git
 
 Then enter in .../Railway Monitoring System\vcpkg\ and run the following commands:
+
 .\bootstrap-vcpkg.bat
+
 .\vcpkg integrate install
+
 .\vcpkg install yaml-cpp:x64-windows
 
 After that you can run.
