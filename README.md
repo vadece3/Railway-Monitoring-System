@@ -18,14 +18,32 @@ Here is an example of the expected console interface:
 ====================================
        RAILWAY MONITORING SYSTEM
 ====================================
+Welcome to the Railway Monitoring System!
+System: Railway Network
 
-1. Register a train
-2. Display all trains
-3. Occupy a track
-4. Release a track
-5. Display signal status
-6. Display system overview
-0. Exit
+Service List:
+====================================
+***Please enter a letter from the list and enter "exit" to end.***
+
+Select the service you want to use by entering the coresponding letter:
+
+1. Train Settings (Enter letter T) -> ***Please enter a letter from the list and enter "exit" to end.***
+
+                                      Select the service you want to use by entering the coresponding letter:
+                                   
+                                      1. Add New Train (Enter letter C)
+                                   
+                                      2. View Train List (Enter letter R)
+                                   
+                                      3. Update Train Details (Enter letter U)
+                                   
+                                      4. Delete Train (Enter letter D)
+
+
+2. Occupy a track
+3. Release a track
+4. Display signal status
+5. Display system overview
 
 Choose an option: 1
 
