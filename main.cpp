@@ -31,7 +31,7 @@ int main()
         {
             std::string* trainResult = trainService.trainServiceOption();
             if(*trainResult == "exit"){
-                continue;
+                break;
             }
         }
         else if (selectedService == "exit")
