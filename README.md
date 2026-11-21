@@ -5,13 +5,30 @@ It will simulate a simple railway monitoring system that allows a user to:
 - update saved trains details(done)
 - view saved trains(done)
 - delete a train detail(done)
-- search (in progress)
+- search (done)
 
 2. Monitor track occupancy.
 3. Display signal status (RED or GREEN).
 4. Detect occupied tracks.
 5. Prevent two trains from using the same track.
 6. Display a railway system overview.
+
+====================================
+       Requirements To Run
+====================================
+1. If you want to run directly, just double click on main.exe.
+2. If you want to compile and run from VS code you have to use the MSVC compiler and run it in x64 bits (https://code.visualstudio.com/docs/cpp/config-msvc#_prerequisites), then you have to clone vcpkg into the working directory (the directory where you cloned the project Railway-Monitoring-System). i.e
+Enter your terminal and run the command:
+ 
+git clone https://github.com/microsoft/vcpkg.git
+
+Then enter in .../Railway Monitoring System\vcpkg\ and run the following commands:
+.\bootstrap-vcpkg.bat
+.\vcpkg integrate install
+.\vcpkg install yaml-cpp:x64-windows
+
+After that you can run.
+
 
 
 Here is an example of the expected console interface:
@@ -64,3 +81,6 @@ SIGNAL STATUS
 Signal A: GREEN
 Signal B: RED
 Signal C: GREEN
+
+
+ 
