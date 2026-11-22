@@ -14,10 +14,10 @@ It will simulate a simple railway monitoring system that allows a user to:
 - delete a track detail(done)
 - search (done)
 
-3. Display signal status (RED or GREEN).
-4. Detect occupied tracks.
-5. Prevent two trains from using the same track.
-6. Prevent two tracks from being used by the same train.
+3. Display signal status (RED or GREEN).(done)
+4. Detect occupied tracks.(done)
+5. Prevent two trains from using the same track.(done)
+6. Prevent two tracks from being used by the same train.(done)
 7. Display a railway system overview.
 
 ====================================
@@ -41,7 +41,7 @@ After that you can run.
 
 
 
-Here is an example of the expected console interface:
+Here is an example of the console interface:
 ====================================
        RAILWAY MONITORING SYSTEM
 ====================================

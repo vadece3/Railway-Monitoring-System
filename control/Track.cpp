@@ -310,6 +310,7 @@ void Track::updateTrack(std::string enteredValue_id)
                         std::cout << "Enter Train Id:\n-> ";
                         std::getline(std::cin >> std::ws, newValue_trainId);
 
+                        //check if the train id exist in train list
                         YAML::Node roottrain = YAML::LoadFile("database/trains.yaml");
 
                         bool trainFound = false;
@@ -325,21 +326,62 @@ void Track::updateTrack(std::string enteredValue_id)
 
                         if (trainFound)
                         {
-                            std::cout << "This train ID exist in train list.\n";
-                            
-                            track["occupancy"] = "occupied";
-                            track["trainId"] = newValue_trainId;
-                            track["signal"] = "red";
-                            
-                            std::ofstream fout("database/trains.yaml");
+                            //check if the train id is already on a track. If it is, delete from that track and set to this track
+                            bool trainTrackFound = false;
+                            for (auto track1 : root["tracks"])
+                            {
+                                if (track1["trainId"].as<std::string>() == newValue_trainId)
+                                {
+                                    trainTrackFound = true;
 
-                            fout << root;
-                            fout.close();
+                                    std::string yesorno;
+                                    std::cout << "This train ID is already on a track. Do you want to set it on this track?\n";
+                                    std::cout << "Enter Y for yes and N for no \n->";
+                                    std::cin >> yesorno;
+                                    
+                                    if(yesorno == "Y"){
+                                        //delete train id from old track
+                                        track1["occupancy"] = "free";
+                                        track1["trainId"] = "no_train";
+                                        track1["signal"] = "green";
 
-                            std::cout << "\nTrack successfully updated!\n";
+                                        //set train id on new track
+                                        track["occupancy"] = "occupied";
+                                        track["trainId"] = newValue_trainId;
+                                        track["signal"] = "red";
+                                        
+                                        std::ofstream fout("database/trains.yaml");
 
-                            break;
-                            
+                                        fout << root;
+                                        fout.close();
+
+                                        std::cout << "\nTrack successfully updated!\n";
+
+                                        return;
+                                    }
+                                    else if(yesorno == "N"){
+                                        return;
+                                    }
+                                    else{
+                                        std::cout << "Wrong option \n->";
+                                        return; 
+                                    }
+                                }
+                            }
+                            if(!trainTrackFound){
+                                track["occupancy"] = "occupied";
+                                track["trainId"] = newValue_trainId;
+                                track["signal"] = "red";
+                                
+                                std::ofstream fout("database/trains.yaml");
+
+                                fout << root;
+                                fout.close();
+
+                                std::cout << "\nTrack successfully updated!\n";
+
+                                break;
+                            }  
                         }
                         if(!trainFound){
                             std::cout << "\nTrain Id not found in Train list\n";

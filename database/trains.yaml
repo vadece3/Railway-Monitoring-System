@@ -23,11 +23,11 @@ tracks:
     trainId: T001
     signal: red
   - id: Track2
+    occupancy: occupied
+    trainId: hg
+    signal: red
+  - id: Track4
     occupancy: free
     trainId: no_train
     signal: green
-  - id: Track4
-    occupancy: free
-    trainId: hg
-    signal: red
     occupency: occupied
