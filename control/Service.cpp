@@ -6,7 +6,7 @@ std::string Service::selectService(){
    
     Service::selectedService;
     int checker = 0;
-    std::string const serviceOptions[2] = {"T","exit"};//enter the letters which will be checked after user has enterd the letter
+    std::string const serviceOptions[3] = {"T","Tr","exit"};//enter the letters which will be checked after user has enterd the letter
     do
     {
         std::cout << "\n\n***Please enter a letter from the list and enter \"exit\" to end.***\n\n";
@@ -31,6 +31,8 @@ std::string Service::getSelectedService(){
     
     // Enter and Print Train information
     std::cout << "1. Train Settings (Enter letter T) \n\n";
+    std::cout << "2. Track Settings (Enter letter Tr) \n\n";
+    std::cout << "3. Exit (Enter exit) \n\n";
     std::cout << "->";
 
     std::cin >> enteredValue;

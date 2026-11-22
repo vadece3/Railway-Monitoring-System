@@ -3,6 +3,7 @@
 #include <string>
 #include "control/Service.h"
 #include "control/Train.h"
+#include "control/Track.h"
 
 int main()
 {
@@ -21,6 +22,7 @@ int main()
     std::cout << "====================================\n";
     Service selectOptiog;
     Train trainService;
+    Track trackService;
     int mainChecker = 0;
 
     do
@@ -31,7 +33,14 @@ int main()
         {
             std::string* trainResult = trainService.trainServiceOption();
             if(*trainResult == "exit"){
-                break;
+                continue;
+            }
+        }
+        else if (selectedService == "Tr")
+        {
+            std::string* trackResult = trackService.trackServiceOption();
+            if(*trackResult == "exit"){
+                continue;
             }
         }
         else if (selectedService == "exit")

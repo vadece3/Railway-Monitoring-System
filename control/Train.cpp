@@ -11,6 +11,7 @@ std::string* Train::trainServiceOption()
     std::string enteredValue_name;
     std::string enteredValue_destination;
     std::string enteredValueSearchParams;
+    std::string enteredValue;
     Train::selectedService;
     int checker = 0;
     std::string const trainOptions[6] = {"C", "R", "U", "D", "S", "exit"};//enter the letters which will be checked after user has enterd the letter
@@ -64,25 +65,25 @@ std::string* Train::trainServiceOption()
                         {
                             std::cout << "\n------Enter the ID of the train you want to search-------\n";
                             std::cout << "->";
-                            std::getline(std::cin >> std::ws, enteredValue_id);
+                            std::getline(std::cin >> std::ws, enteredValue);
 
-                            search(enteredValue_id,enteredValueSearchParams);
+                            search(enteredValue,enteredValueSearchParams);
                         }
                         else if (enteredValueSearchParams == "N")
                         {
                             std::cout << "\n------Enter the Name of the train you want to search-------\n";
                             std::cout << "->";
-                            std::getline(std::cin >> std::ws, enteredValue_id);
+                            std::getline(std::cin >> std::ws, enteredValue);
 
-                            search(enteredValue_id,enteredValueSearchParams);
+                            search(enteredValue,enteredValueSearchParams);
                         }
                         else if (enteredValueSearchParams == "D")
                         {
                             std::cout << "\n------Enter the Destination of the train you want to search-------\n";
                             std::cout << "->";
-                            std::getline(std::cin >> std::ws, enteredValue_id);
+                            std::getline(std::cin >> std::ws, enteredValue);
 
-                            search(enteredValue_id,enteredValueSearchParams);
+                            search(enteredValue,enteredValueSearchParams);
                         }
                         else
                         {
@@ -114,6 +115,7 @@ std::string Train::getSelectedService(){
     std::cout << "3. Update Train Details (Enter letter U) \n\n";
     std::cout << "4. Delete Train (Enter letter D) \n\n";
     std::cout << "5. Search for a particular train (Enter letter S) \n\n";
+    std::cout << "6. Exit (Enter exit) \n\n";
     std::cout << "->";
 
     std::cin >> enteredValue;
@@ -321,7 +323,7 @@ void Train::updateTrain(std::string enteredValue_id)
 }
 
 //searching by ID or train name or train destination
-void Train::search(std::string enteredValue_id, std::string searchParams){
+void Train::search(std::string enteredValue, std::string searchParams){
     try
     {
         YAML::Node root = YAML::LoadFile("database/trains.yaml");
@@ -337,7 +339,7 @@ void Train::search(std::string enteredValue_id, std::string searchParams){
         for (auto train : root["trains"])
         {
             if(searchParams == "I"){
-                if (train["id"].as<std::string>() == enteredValue_id)
+                if (train["id"].as<std::string>() == enteredValue)
                 {
                     trainFound = true;
 
@@ -353,7 +355,7 @@ void Train::search(std::string enteredValue_id, std::string searchParams){
                 }
             }
             if(searchParams == "N"){
-                if (train["name"].as<std::string>() == enteredValue_id)
+                if (train["name"].as<std::string>() == enteredValue)
                 {
                     trainFound = true;
 
@@ -369,7 +371,7 @@ void Train::search(std::string enteredValue_id, std::string searchParams){
                 }
             }
             if(searchParams == "D"){
-                if (train["destination"].as<std::string>() == enteredValue_id)
+                if (train["destination"].as<std::string>() == enteredValue)
                 {
                     trainFound = true;
 

@@ -5,6 +5,29 @@ trains:
   - id: T002
     name: ICE Hamburg
     destination: Hamburg
-  - id: Td n
-    name: Df c
-    destination: Hs f
+  - id: hg
+    name: gh
+    destination: hj
+  - id: hg
+    name: ghdf
+    destination: hje
+  - id: df 4
+    name: ss 4
+    destination: s
+  - id: w 5
+    name: f
+    destination: e
+tracks:
+  - id: Track1
+    occupancy: occupied
+    trainId: T001
+    signal: red
+  - id: Track2
+    occupancy: free
+    trainId: no_train
+    signal: green
+  - id: Track4
+    occupancy: free
+    trainId: hg
+    signal: red
+    occupency: occupied
