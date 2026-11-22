@@ -8,6 +8,12 @@ It will simulate a simple railway monitoring system that allows a user to:
 - search (done)
 
 2. Monitor track occupancy.
+- save the added track(done)
+- update saved track details(done)
+- view saved track(done)
+- delete a track detail(done)
+- search (done)
+
 3. Display signal status (RED or GREEN).
 4. Detect occupied tracks.
 5. Prevent two trains from using the same track.
@@ -61,9 +67,27 @@ Select the service you want to use by entering the coresponding letter:
 
                                       5. Search for a particular train (Enter letter S)
 
+                                      6. Exit (Enter exit)
 
-2. Occupy a track
-3. Release a track
+2. Track Settings (Enter letter Tr) -> ***Please enter a letter from the list and enter "exit" to end.***
+
+                                      Select the service you want to use by entering the coresponding letter:
+
+                                      1. Add New Track (Enter letter C)
+
+                                      2. View Track List (Enter letter R)
+
+                                      3. Update Track Details (Enter letter U)
+
+                                      4. Delete Track (Enter letter D)
+
+                                      5. Search for a particular track (Enter letter S)
+
+                                      6. Exit (Enter exit)
+
+
+
+3. Occupy a track and Release a track
 4. Display signal status
 5. Display system overview
 
