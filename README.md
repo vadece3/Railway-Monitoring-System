@@ -17,7 +17,8 @@ It will simulate a simple railway monitoring system that allows a user to:
 3. Display signal status (RED or GREEN).
 4. Detect occupied tracks.
 5. Prevent two trains from using the same track.
-6. Display a railway system overview.
+6. Prevent two tracks from being used by the same train.
+7. Display a railway system overview.
 
 ====================================
        Requirements To Run
@@ -84,12 +85,26 @@ Select the service you want to use by entering the coresponding letter:
                                       5. Search for a particular track (Enter letter S)
 
                                       6. Exit (Enter exit)
+                                   
+3. Display signal status (RED or GREEN) (Enter letter S) -> ***Please enter a letter from the list and enter "exit" to end.***
+
+                                                            Select the service you want to use by entering the coresponding letter:
+
+                                                            1. View all Track signal (Enter letter A)
+
+                                                            2. View Red signal Track List (Free Tracks) (Enter letter R)
+
+                                                            3. View Green signal Track List (Occupied Tracks) (Enter letter G)
+
+                                                            4. Search signal of a particular Track (Enter letter S)
+
+                                                            5. Exit (Enter exit)
 
 
 
-3. Occupy a track and Release a track
-4. Display signal status
-5. Display system overview
+4. Occupy a track and Release a track
+5. Display signal status
+6. Display system overview
 
 Choose an option: 1
 

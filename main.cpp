@@ -4,6 +4,7 @@
 #include "control/Service.h"
 #include "control/Train.h"
 #include "control/Track.h"
+#include "control/Signal.h"
 
 int main()
 {
@@ -23,6 +24,7 @@ int main()
     Service selectOptiog;
     Train trainService;
     Track trackService;
+    Signal signalService;
     int mainChecker = 0;
 
     do
@@ -40,6 +42,13 @@ int main()
         {
             std::string* trackResult = trackService.trackServiceOption();
             if(*trackResult == "exit"){
+                continue;
+            }
+        }
+        else if (selectedService == "S")
+        {
+            std::string* signalResult = signalService.signalServiceOption();
+            if(*signalResult == "exit"){
                 continue;
             }
         }
