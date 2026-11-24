@@ -37,7 +37,9 @@ std::string* Signal::signalServiceOption()
                         checker = 1;
                         break;
                     }
-                }
+                }else {
+                        std::cout << "\nInvalid input\n" ;
+                    }
             }
     } while (checker == 0);
   
@@ -123,11 +125,6 @@ void Signal::viewOccupiedSignals(){
                     << std::setw(colWidth) << track["occupancy"].as<std::string>()
                     << std::setw(colWidth) << track["trainId"].as<std::string>()
                     << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                std::ofstream fout("database/trains.yaml");
-
-                fout << root;
-                fout.close();
             }
                 
         }
@@ -162,11 +159,6 @@ void Signal::viewfreeSignals(){
                     << std::setw(colWidth) << track["occupancy"].as<std::string>()
                     << std::setw(colWidth) << track["trainId"].as<std::string>()
                     << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                std::ofstream fout("database/trains.yaml");
-
-                fout << root;
-                fout.close();
             }
                 
         }
@@ -203,11 +195,6 @@ void Signal::viewsearchedIDSignals(std::string enteredValue_id){
                     << std::setw(colWidth) << track["occupancy"].as<std::string>()
                     << std::setw(colWidth) << track["trainId"].as<std::string>()
                     << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                std::ofstream fout("database/trains.yaml");
-
-                fout << root;
-                fout.close();
             }
                 
         }

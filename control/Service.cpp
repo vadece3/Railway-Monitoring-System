@@ -16,7 +16,9 @@ std::string Service::selectService(){
                 if(selectedService == serviceOptions[i]){
                     checker = 1;
                     break;
-                }
+                }else {
+                        std::cout << "\nInvalid input\n" ;
+                    }
             }
     } while (checker == 0);
     

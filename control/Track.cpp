@@ -98,7 +98,9 @@ std::string* Track::trackServiceOption()
                         checker = 1;
                         break;
                     }
-                }
+                }else {
+                        std::cout << "\nInvalid input\n" ;
+                    }
             }
     } while (checker == 0);
   
