@@ -8,9 +8,6 @@ trains:
   - id: hg
     name: gh
     destination: hj
-  - id: hg
-    name: ghdf
-    destination: hje
   - id: df 4
     name: ss 4
     destination: s
