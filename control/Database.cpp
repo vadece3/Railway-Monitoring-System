@@ -808,3 +808,567 @@ bool Database::addTrack(const std::string& trackID){
 
     return false;
 }
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+//                                              TAINS
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+// ------------------------------------------
+//  TAINS:  DATABASE VALIDATION
+// ------------------------------------------
+/*
+This function checks whether the existing YAML database contains valid and consistent train information.
+The purpose is to prevent your application from working with malformed or inconsistent railway data.
+*/
+bool Database::validateDatabaseTrain(
+    const std::string& filePath)
+{
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+
+        if (!root["trains"] ||
+            !root["trains"].IsSequence())
+        {
+            std::cerr << "Invalid database structure.\n";
+            return false;
+        }
+
+        /*
+        std::unordered_set: 
+        Key properties:
+        No duplicates: If you insert the same string twice, only one copy is stored.
+        Unordered: The elements are not stored in any particular order; iteration order is not guaranteed.
+        Fast lookups: Uses hashing internally, so find() and insert() are typically O(1) on average.
+        */
+        std::unordered_set<std::string> trainIDs;
+
+        for (const auto& train : root["trains"])
+        {
+            if (!train.IsMap() ||
+                !train["id"] ||
+                !train["name"] ||
+                !train["destination"])
+            {
+                std::cerr << "Missing train information.\n";
+                return false;
+            }
+
+            std::string id =
+                train["id"].as<std::string>();
+
+            // Prevent duplicate track IDs.
+            if (id.empty() ||
+                !trainIDs.insert(id).second)
+            {
+                std::cerr << "Invalid or duplicate train ID.\n";
+                return false;
+            }
+        }
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "Database validation error: "
+                  << e.what() << '\n';
+
+        return false;
+    }
+}
+
+
+// ------------------------------------------
+// TAINS:  SECURE DATABASE UPDATE
+// ------------------------------------------
+
+bool Database::updateTraindetails(const std::string& trainID)
+{
+    //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to update data to database.\n";
+        return false;
+    }
+    std::string trainFile = Configuration::trainDatabase;
+    std::string tempTrainDatabase = Configuration::tempTrainDatabase;
+    std::string backupTrainDatabase = Configuration::backupTrainDatabase;
+
+    std::string enteredValue_item;
+    std::string newValue;
+
+    /*  std::mutex:
+        A synchronization object that allows only one thread at a time to hold its lock
+        std::lock_guard:
+        A C++ utility that automatically locks a mutex when constructed and unlocks it when destroyed.
+    */
+    std::lock_guard<std::mutex> lock(databaseMutex);
+
+    const std::string filePath = trainFile;
+
+    const std::string tempPath = tempTrainDatabase;
+
+    const std::string backupPath = backupTrainDatabase;
+    
+    // Validate user input
+
+    if (trainID.empty())
+    {
+        std::cerr << "Invalid train ID.\n";
+        return false;
+    }
+
+    // Validate existing database
+
+    if (!validateDatabaseTrack(filePath))
+    {
+        std::cerr << "Existing database is invalid.\n";
+        return false;
+    }
+
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+
+        bool trainFound = false;
+
+        //Find and update the requested train
+
+        for (auto train : root["trains"])
+        {
+            {
+                trainFound = true;
+
+                std::cout << "\n------ What do you want to update? ------\n";
+                std::cout << "1. Train Name (Enter N)\n";
+                std::cout << "2. Train Destination (Enter D)\n";
+                std::cout << "-> ";
+
+                std::getline(std::cin >> std::ws, enteredValue_item);
+
+                if (enteredValue_item == "N")
+                {
+                    std::cout << "Old Train Name: "
+                              << train["name"].as<std::string>() << "\n";
+
+                    std::cout << "Enter New Train Name:\n-> ";
+                    std::getline(std::cin >> std::ws, newValue);
+
+                    train["name"] = newValue;
+                }
+                else if (enteredValue_item == "D")
+                {
+                    std::cout << "Old Train Destination: "
+                              << train["destination"].as<std::string>() << "\n";
+
+                    std::cout << "Enter New Train Destination:\n-> ";
+                    std::getline(std::cin >> std::ws, newValue);
+
+                    train["destination"] = newValue;
+                }
+                else
+                {
+                    std::cerr << "This option is not available.\n";
+                    break;
+                }
+                std::ofstream fout(trainFile);
+
+                fout << root;
+                fout.close();
+
+                std::cout << "\nTrain successfully updated!\n";
+
+                break;
+            }
+        }
+
+        if (!trainFound)
+        {
+            std::cerr << "Train not found.\n";
+            return false;
+        }
+
+        // Save changes to a temporary file
+        {
+            std::ofstream fout(tempPath);
+
+            if (!fout.is_open())
+            {
+                std::cerr << "Cannot create temporary database.\n";
+                return false;
+            }
+
+            fout << root;
+            fout.flush();
+
+            if (!fout.good())
+            {
+                fout.close();
+                fs::remove(tempPath);
+
+                std::cerr << "Failed to write temporary database.\n";
+                return false;
+            }
+        }
+
+        // Validate the modified database
+        if (!validateDatabaseTrack(tempPath))
+        {
+            fs::remove(tempPath);
+
+            std::cerr << "Updated database failed validation.\n";
+            return false;
+        }
+
+        //Backup original database
+        if (fs::exists(backupPath))
+        {
+            fs::remove(backupPath);
+        }
+
+        fs::rename(filePath, backupPath);
+
+        //Replace original database
+        try
+        {
+            fs::rename(tempPath, filePath);
+        }
+        catch (...)
+        {
+            // Restore original database if replacement fails.
+            fs::rename(backupPath, filePath);
+            throw;
+        }
+
+        //Remove backup after successful replacement
+        fs::remove(backupPath);
+
+        std::cout << "\nDatabase updated successfully!\n";
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "YAML error: "
+                  << e.what() << '\n';
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        std::cerr << "File operation error: "
+                  << e.what() << '\n';
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Database update error: "
+                  << e.what() << '\n';
+    }
+
+    // Remove an incomplete temporary file.
+    std::error_code error;
+    fs::remove(tempPath, error);
+
+    return false;
+}
+
+
+bool Database::deleteTrain(const std::string& trainID){
+    
+    //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to delete data to database.\n";
+        return false;
+    }
+    std::string trainFile = Configuration::trainDatabase;
+    std::string tempTrainDatabase = Configuration::tempTrainDatabase;
+    std::string backupTrainDatabase = Configuration::backupTrainDatabase;
+    
+    std::lock_guard<std::mutex> lock(databaseMutex);
+
+    const std::string filePath = trainFile;
+
+    const std::string tempPath = tempTrainDatabase;
+
+    const std::string backupPath = backupTrainDatabase;
+    
+    // Validate user input
+
+    if (trainID.empty())
+    {
+        std::cerr << "Invalid train ID.\n";
+        return false;
+    }
+
+    // Validate existing database
+
+    if (!validateDatabaseTrack(filePath))
+    {
+        std::cerr << "Existing database is invalid.\n";
+        return false;
+    }
+
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+        YAML::Node updated(YAML::NodeType::Sequence);
+
+        bool trainFound = false;
+
+        //Find and update the requested track
+        for (auto train : root["trains"])
+        {
+            if (train["id"].as<std::string>() == trainID)
+            {
+                trainFound = true;
+
+                for (const auto& train : root["trains"])
+                {
+                    if (train["id"].as<std::string>() != trainID)
+                    {
+                        updated.push_back(train);
+                    }
+                }
+                break;
+            }
+        }
+
+        if (!trainFound)
+        {
+            std::cerr << "Train not found.\n";
+            return false;
+        }
+
+        // Save changes to a temporary file
+        {
+            std::ofstream fout(tempPath);
+
+            if (!fout.is_open())
+            {
+                std::cerr << "Cannot create temporary database.\n";
+                return false;
+            }
+
+            root["trains"] = updated;
+            fout << root;
+            fout.flush();
+
+            if (!fout.good())
+            {
+                fout.close();
+                fs::remove(tempPath);
+
+                std::cerr << "Failed to write temporary database.\n";
+                return false;
+            }
+        }
+
+        // Validate the modified database
+        if (!validateDatabaseTrack(tempPath))
+        {
+            fs::remove(tempPath);
+
+            std::cerr << "Updated database failed validation.\n";
+            return false;
+        }
+
+        //Backup original database
+        if (fs::exists(backupPath))
+        {
+            fs::remove(backupPath);
+        }
+
+        fs::rename(filePath, backupPath);
+
+        //Replace original database
+        try
+        {
+            fs::rename(tempPath, filePath);
+        }
+        catch (...)
+        {
+            // Restore original database if replacement fails.
+            fs::rename(backupPath, filePath);
+            throw;
+        }
+
+        //Remove backup after successful replacement
+        fs::remove(backupPath);
+
+        std::cout << "\nDatabase updated successfully!\n";
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "YAML error: "
+                  << e.what() << '\n';
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        std::cerr << "File operation error: "
+                  << e.what() << '\n';
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Database update error: "
+                  << e.what() << '\n';
+    }
+
+    // Remove an incomplete temporary file.
+    std::error_code error;
+    fs::remove(tempPath, error);
+
+    return false;
+}
+
+
+bool Database::addTrain(const std::string& trainID, const std::string& name, const std::string& destination){
+
+     //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to add data to database.\n";
+        return false;
+    }
+    std::string trainFile = Configuration::trainDatabase;
+    std::string tempTrainDatabase = Configuration::tempTrainDatabase;
+    std::string backupTrainDatabase = Configuration::backupTrainDatabase;
+
+    
+    std::lock_guard<std::mutex> lock(databaseMutex);
+
+    const std::string filePath = trainFile;
+
+    const std::string tempPath = tempTrainDatabase;
+
+    const std::string backupPath = backupTrainDatabase;
+    
+    // Validate user input
+
+    if (trainID.empty())
+    {
+        std::cerr << "Invalid track ID.\n";
+        return false;
+    }
+
+    // Validate existing database
+
+    if (!validateDatabaseTrack(filePath))
+    {
+        std::cerr << "Existing database is invalid.\n";
+        return false;
+    }
+
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+        YAML::Node train;
+
+        bool trainFound = false;
+
+        //Find and update the requested train
+
+        for (auto train : root["trains"])
+        {
+            if (train["id"].as<std::string>() == trainID)
+            {
+                trainFound = true;
+                break;
+            }
+        }
+
+        if (trainFound)
+        {
+            std::cerr << "Train ID already exist.\n";
+            return false;
+        }
+        else if(!trainFound)// Save changes to a temporary file
+        {
+            std::ofstream fout(tempPath);
+
+            if (!fout.is_open())
+            {
+                std::cerr << "Cannot create temporary database.\n";
+                return false;
+            }
+
+            train["id"] = trainID;
+            train["name"] = name;
+            train["destination"] = destination;
+
+            root["trains"].push_back(train);
+            
+            fout << root;
+            fout.flush();
+
+            if (!fout.good())
+            {
+                fout.close();
+                fs::remove(tempPath);
+
+                std::cerr << "Failed to write temporary database.\n";
+                return false;
+            }
+        }
+
+        // Validate the modified database
+        if (!validateDatabaseTrack(tempPath))
+        {
+            fs::remove(tempPath);
+
+            std::cerr << "Updated database failed validation.\n";
+            return false;
+        }
+
+        //Backup original database
+        if (fs::exists(backupPath))
+        {
+            fs::remove(backupPath);
+        }
+
+        fs::rename(filePath, backupPath);
+
+        //Replace original database
+        try
+        {
+            fs::rename(tempPath, filePath);
+        }
+        catch (...)
+        {
+            // Restore original database if replacement fails.
+            fs::rename(backupPath, filePath);
+            throw;
+        }
+
+        //Remove backup after successful replacement
+        fs::remove(backupPath);
+
+        std::cout << "\nDatabase updated successfully!\n";
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "YAML error: "
+                  << e.what() << '\n';
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        std::cerr << "File operation error: "
+                  << e.what() << '\n';
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Database update error: "
+                  << e.what() << '\n';
+    }
+
+    // Remove an incomplete temporary file.
+    std::error_code error;
+    fs::remove(tempPath, error);
+
+    return false;
+}

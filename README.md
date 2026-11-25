@@ -25,8 +25,8 @@ It will simulate a simple railway monitoring system that allows a user to:
 8. Secure Database by giving controled access
 - Only logged in users can create, update or delete in the database:
 i. tracks(done)
-ii. trains
-- Onlay admin can create a new user.
+ii. trains(done)
+- Only admin can create a new user.
 9. Optimize code
 
 ====================================

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "Signal.h"
+#include "Configuration.h"
 #include <iomanip>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -79,7 +80,15 @@ std::string Signal::signalgetSelectedService(){
 void Signal::viewAllSignalOccupancy(){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         std::cout << "====================================\n";
         std::cout << "      TRACKS SIGNAL DETAILS\n";
@@ -113,7 +122,15 @@ void Signal::viewAllSignalOccupancy(){
 void Signal::viewOccupiedSignals(){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         const int colWidth = 20;
         std::cout << std::left 
@@ -147,7 +164,15 @@ void Signal::viewOccupiedSignals(){
 void Signal::viewfreeSignals(){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         const int colWidth = 20;
         std::cout << std::left 
@@ -181,7 +206,15 @@ void Signal::viewfreeSignals(){
 void Signal::viewsearchedIDSignals(std::string enteredValue_id){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+        
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         bool trackFound = false;
         const int colWidth = 20;

@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include "Train.h"
+#include "Database.h"
+#include "Configuration.h"
 #include <iomanip>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -136,53 +138,57 @@ std::string Train::getSelectedService(){
 //adding new train
 void Train::addTrain(std::string id, std::string name, std::string destination){
 
-    try
+    std::string enteredValue_username;
+    std::string enteredValue_password;
+
+    std::cout << "You must login to add a Train\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_username);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_password);
+
+    Database database;
+    bool logedin = database.authenticateUser(enteredValue_username, enteredValue_password);
+
+    if (!logedin)
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
-        YAML::Node train;
-
-        bool trainFound = false;
-
-        for (auto train : root["trains"])
-        {
-            if (train["id"].as<std::string>() == id)
-            {
-                trainFound = true;
-                break;
-            }
-        }
-
-        if (trainFound)
-        {
-            std::cerr << "This ID alreay exist.\n";
-            return;
-        }
-        else if(!trainFound){
-            train["id"] = id;
-            train["name"] = name;
-            train["destination"] = destination;
-
-            root["trains"].push_back(train);
-                
-            std::ofstream fout("database/trains.yaml");
-
-            fout << root;
-            fout.close();
-
-            std::cout << "\n\nTRAIN REGISTERED SUCCESSFULLY!!\n\n";
-        }
+        std::cerr << "Train details update rejected.\n";
+        return;
     }
-    catch (const YAML::Exception& e)
+
+    std::cout << "Login Successfull.\n";
+    bool addTrain = database.addTrain(id,name,destination);
+    
+    if (addTrain)
     {
-        std::cerr << "YAML error: " << e.what() << '\n';
+        std::cout << "Train was successfully added\n";
+        return;
     }
+    if (!addTrain)
+    {
+        std::cerr << "Failed to add Train\n";
+        return;
+    }  
 }
 
 //viewing all trains
 void Train::viewTrain(){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         std::cout << "====================================\n";
         std::cout << "      TRAINS DETAILS\n";
@@ -213,121 +219,83 @@ void Train::viewTrain(){
 //deleting train with respect to the train ID
 void Train::deleteTrain(std::string enteredValue_id){
 
-    YAML::Node root = YAML::LoadFile("database/trains.yaml");
+    std::string enteredValue_username;
+    std::string enteredValue_password;
 
-    YAML::Node updated(YAML::NodeType::Sequence);
+    std::cout << "You must login to delete a Train\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
 
-    try
+    std::getline(std::cin >> std::ws, enteredValue_username);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_password);
+
+    Database database;
+    bool logedin = database.authenticateUser(enteredValue_username, enteredValue_password);
+
+    if (!logedin)
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
-
-        bool trainFound = false;
-
-        for (auto train : root["trains"])
-        {
-            if (train["id"].as<std::string>() == enteredValue_id)
-            {
-                trainFound = true;
-                for (const auto& train : root["trains"])
-                {
-                    if (train["id"].as<std::string>() != enteredValue_id)
-                    {
-                        updated.push_back(train);
-                    }
-                }
-                break;
-            }
-        }
-
-        if (!trainFound)
-        {
-            std::cerr << "This ID does not exist.\n";
-            return;
-        }
-
-        root["trains"] = updated;
-
-        std::ofstream fout("database/trains.yaml");
-        fout << root;
-        fout.close();
+        std::cerr << "Train details update rejected.\n";
+        return;
     }
-    catch (const YAML::Exception& e)
+
+    std::cout << "Login Successfull.\n";
+    bool deleteTrain = database.deleteTrain(enteredValue_id);
+    
+    if (deleteTrain)
     {
-        std::cerr << "YAML error: " << e.what() << '\n';
+        std::cout << "Train was successfully deleted\n";
+        return;
+    }
+    if (!deleteTrain)
+    {
+        std::cerr << "Failed to delete Train\n";
+        return;
     }
 }
 
 //updating train by searching the train ID
 void Train::updateTrain(std::string enteredValue_id)
 {
-    std::string enteredValue_item;
-    std::string newValue;
 
-    try
+    std::string enteredValue_username;
+    std::string enteredValue_password;
+
+    std::cout << "You must login to update\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_username);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_password);
+
+    Database database;
+    bool logedin = database.authenticateUser(enteredValue_username, enteredValue_password);
+
+    if (!logedin)
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
-
-        bool trainFound = false;
-
-        for (auto train : root["trains"])
-        {
-            if (train["id"].as<std::string>() == enteredValue_id)
-            {
-                trainFound = true;
-
-                std::cout << "\n------ What do you want to update? ------\n";
-                std::cout << "1. Train Name (Enter N)\n";
-                std::cout << "2. Train Destination (Enter D)\n";
-                std::cout << "-> ";
-
-                std::getline(std::cin >> std::ws, enteredValue_item);
-
-                if (enteredValue_item == "N")
-                {
-                    std::cout << "Old Train Name: "
-                              << train["name"].as<std::string>() << "\n";
-
-                    std::cout << "Enter New Train Name:\n-> ";
-                    std::getline(std::cin >> std::ws, newValue);
-
-                    train["name"] = newValue;
-                }
-                else if (enteredValue_item == "D")
-                {
-                    std::cout << "Old Train Destination: "
-                              << train["destination"].as<std::string>() << "\n";
-
-                    std::cout << "Enter New Train Destination:\n-> ";
-                    std::getline(std::cin >> std::ws, newValue);
-
-                    train["destination"] = newValue;
-                }
-                else
-                {
-                    std::cerr << "This option is not available.\n";
-                    break;
-                }
-                std::ofstream fout("database/trains.yaml");
-
-                fout << root;
-                fout.close();
-
-                std::cout << "\nTrain successfully updated!\n";
-
-                break;
-            }
-        }
-
-        if (!trainFound)
-        {
-            std::cerr << "This ID does not exist.\n";
-            return;
-        }
-
+        std::cerr << "Train details update rejected.\n";
+        return;
     }
-    catch (const YAML::Exception& e)
+
+    std::cout << "Login Successfull.\n";
+    bool updateTraindetails = database.updateTraindetails(enteredValue_id);
+    
+    if (updateTraindetails)
     {
-        std::cerr << "YAML error: " << e.what() << '\n';
+        std::cout << "Train details was successfully updated\n";
+        return;
+    }
+    if (!updateTraindetails)
+    {
+        std::cerr << "Train details failed to update\n";
+        return;
     }
 }
 
@@ -335,7 +303,15 @@ void Train::updateTrain(std::string enteredValue_id)
 void Train::search(std::string enteredValue, std::string searchParams){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         bool trainFound = false;
 
@@ -357,7 +333,7 @@ void Train::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << train["name"].as<std::string>()
                         << std::setw(colWidth) << train["destination"].as<std::string>() << "\n";
 
-                    std::ofstream fout("database/trains.yaml");
+                    std::ofstream fout(trainFile);
 
                     fout << root;
                     fout.close();
@@ -373,7 +349,7 @@ void Train::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << train["name"].as<std::string>()
                         << std::setw(colWidth) << train["destination"].as<std::string>() << "\n";
 
-                    std::ofstream fout("database/trains.yaml");
+                    std::ofstream fout(trainFile);
 
                     fout << root;
                     fout.close();
@@ -389,7 +365,7 @@ void Train::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << train["name"].as<std::string>()
                         << std::setw(colWidth) << train["destination"].as<std::string>() << "\n";
 
-                    std::ofstream fout("database/trains.yaml");
+                    std::ofstream fout(trainFile);
 
                     fout << root;
                     fout.close();

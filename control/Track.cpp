@@ -308,7 +308,15 @@ void Track::updateTrack(std::string enteredValue_id)
 void Track::search(std::string enteredValue, std::string searchParams){
     try
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
+        //set database file path
+        if (!Configuration::loadConfig())
+        {
+            std::cerr << "Config Data Failure: Unable to view data from database.\n";
+            return;
+        }
+        std::string trainFile = Configuration::trainDatabase;
+        
+        YAML::Node root = YAML::LoadFile(trainFile);
 
         bool trackFound = false;
 

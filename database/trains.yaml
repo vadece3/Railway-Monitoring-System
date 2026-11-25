@@ -8,12 +8,9 @@ trains:
   - id: hg
     name: gh
     destination: hj
-  - id: df 4
-    name: ss 4
-    destination: s
-  - id: w 5
-    name: f
-    destination: e
+  - id: T003
+    name: RB Goslar
+    destination: Hannover
 tracks:
   - id: Track1
     occupancy: occupied
