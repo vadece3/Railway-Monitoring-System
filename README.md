@@ -26,8 +26,8 @@ It will simulate a simple railway monitoring system that allows a user to:
 - Only logged in users can create, update or delete in the database:
 i. tracks(done)
 ii. trains(done)
-- Only admin can create a new user.
-9. Optimize code
+- Only admin can have access to users settings(done).
+
 
 ====================================
        Requirements To Run

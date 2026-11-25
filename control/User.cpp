@@ -18,12 +18,39 @@ std::string User::userUpdates()
     std::string enteredValue_username;
     std::string enteredValue_userpassword;
     std::string enteredValueSearchParams;
+    
+    std::string enteredValue_adminusername;
+    std::string enteredValue_adminpassword;
 
     User::selectedService;
     int checker = 0;
     int invalidInputChecker = 1;
     std::string const trainOptions[6] = {"C", "R", "D", "S", "exit"};//enter the letters which will be checked after user has enterd the letter
     
+
+    // only admin can access
+    std::cout << "You must login to access user settings\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_adminusername);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_adminpassword);
+
+    Database database;
+    bool logedin = database.authorizeAdmin(enteredValue_adminusername, enteredValue_adminpassword);
+
+    if (!logedin)
+    {
+        std::cerr << "User rejected.\n";
+        return "exit";
+    }
+    std::cout << "Admin Login Successfull.\n";
+
+    //show the page after admin login successfull
     do
     {
         viewUser();
@@ -101,31 +128,7 @@ std::string User::usergetSelectedService(){
 
 //adding new user
 void User::addUser(std::string enteredValue_username, std::string enteredValue_password){
-
-    std::string enteredValue_adminusername;
-    std::string enteredValue_adminpassword;
-
-    std::cout << "You must login as admin to add a User\n";
-    std::cout << "Enter username\n";
-    std::cout << "-> ";
-
-    std::getline(std::cin >> std::ws, enteredValue_adminusername);
-
-    std::cout << "Enter password\n";
-    std::cout << "-> ";
-
-    std::getline(std::cin >> std::ws, enteredValue_adminpassword);
-
     Database database;
-    bool logedin = database.authorizeAdmin(enteredValue_adminusername, enteredValue_adminusername);
-
-    if (!logedin)
-    {
-        std::cerr << "User details update rejected.\n";
-        return;
-    }
-
-    std::cout << "Login Successfull.\n";
     bool addUser = database.addNewUser(enteredValue_username,enteredValue_password);
     
     if (addUser)
@@ -181,30 +184,7 @@ void User::viewUser(){
 //deleting train with respect to the username
 void User::deleteUser(std::string enteredValue_username){
 
-    std::string enteredValue_adminusername;
-    std::string enteredValue_adminpassword;
-
-    std::cout << "You must login to delete a Train\n";
-    std::cout << "Enter username\n";
-    std::cout << "-> ";
-
-    std::getline(std::cin >> std::ws, enteredValue_adminusername);
-
-    std::cout << "Enter password\n";
-    std::cout << "-> ";
-
-    std::getline(std::cin >> std::ws, enteredValue_adminpassword);
-
     Database database;
-    bool logedin = database.authorizeAdmin(enteredValue_adminusername, enteredValue_adminpassword);
-
-    if (!logedin)
-    {
-        std::cerr << "User details update rejected.\n";
-        return;
-    }
-
-    std::cout << "Login Successfull.\n";
     bool deleteUser = database.deleteUser(enteredValue_username);
     
     if (deleteUser)
