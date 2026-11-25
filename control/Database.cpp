@@ -1,6 +1,6 @@
 
 #include "Database.h"
-
+#include "Configuration.h"
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -37,6 +37,14 @@ bool Database::authorizeAdmin(
     const std::string& username,
     const std::string& password)
 {
+    //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to get data to database.\n";
+        return false;
+    }
+    std::string loginFile = Configuration::loginDatabase;
+
     try
     {
         // First authenticate the user
@@ -46,7 +54,7 @@ bool Database::authorizeAdmin(
             return false;
         }
 
-        YAML::Node root = YAML::LoadFile("database/login.yaml");
+        YAML::Node root = YAML::LoadFile(loginFile);
 
         // Find the authenticated user
         for (const auto& user : root["Users"])
@@ -84,10 +92,18 @@ bool Database::authenticateUser(
     const std::string& username,
     const std::string& password)
 {
+       //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to get data to database.\n";
+        return false;
+    }
+    std::string loginFile = Configuration::loginDatabase;
+
     try
     {
         // Load login credentials
-        YAML::Node root = YAML::LoadFile("database/login.yaml");
+        YAML::Node root = YAML::LoadFile(loginFile);
 
         // Iterate through registered users
         for (const auto& user : root["Users"])
@@ -243,6 +259,15 @@ bool Database::validateDatabaseTrack(
 
 bool Database::updateTrackOccupancy(const std::string& trackID)
 {
+    //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to update data to database.\n";
+        return false;
+    }
+    std::string trainFile = Configuration::trainDatabase;
+    std::string tempTrainDatabase = Configuration::tempTrainDatabase;
+    std::string backupTrainDatabase = Configuration::backupTrainDatabase;
 
     std::string enteredValue_item;
     std::string newValue_occupency;
@@ -256,14 +281,11 @@ bool Database::updateTrackOccupancy(const std::string& trackID)
     */
     std::lock_guard<std::mutex> lock(databaseMutex);
 
-    const std::string filePath =
-        "database/trains.yaml";
+    const std::string filePath = trainFile;
 
-    const std::string tempPath =
-        "database/trains.tmp.yaml";
+    const std::string tempPath = tempTrainDatabase;
 
-    const std::string backupPath =
-        "database/trains.backup.yaml";
+    const std::string backupPath = backupTrainDatabase;
     
     // Validate user input
 
@@ -319,7 +341,7 @@ bool Database::updateTrackOccupancy(const std::string& trackID)
                         std::getline(std::cin >> std::ws, newValue_trainId);
 
                         //check if the train id exist in train list
-                        YAML::Node roottrain = YAML::LoadFile("database/trains.yaml");
+                        YAML::Node roottrain = YAML::LoadFile(trainFile);
 
                         bool trainFound = false;
 
@@ -485,16 +507,23 @@ bool Database::updateTrackOccupancy(const std::string& trackID)
 
 bool Database::deleteTrack(const std::string& trackID){
     
+    //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to delete data to database.\n";
+        return false;
+    }
+    std::string trainFile = Configuration::trainDatabase;
+    std::string tempTrainDatabase = Configuration::tempTrainDatabase;
+    std::string backupTrainDatabase = Configuration::backupTrainDatabase;
+    
     std::lock_guard<std::mutex> lock(databaseMutex);
 
-    const std::string filePath =
-        "database/trains.yaml";
+    const std::string filePath = trainFile;
 
-    const std::string tempPath =
-        "database/trains.tmp.yaml";
+    const std::string tempPath = tempTrainDatabase;
 
-    const std::string backupPath =
-        "database/trains.backup.yaml";
+    const std::string backupPath = backupTrainDatabase;
     
     // Validate user input
 
@@ -629,20 +658,28 @@ bool Database::deleteTrack(const std::string& trackID){
 
 
 bool Database::addTrack(const std::string& trackID){
+
+     //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to add data to database.\n";
+        return false;
+    }
+    std::string trainFile = Configuration::trainDatabase;
+    std::string tempTrainDatabase = Configuration::tempTrainDatabase;
+    std::string backupTrainDatabase = Configuration::backupTrainDatabase;
+
     std::string occupancy = "free";
     std::string trainId = "no_train";
     std::string signal = "green";
     
     std::lock_guard<std::mutex> lock(databaseMutex);
 
-    const std::string filePath =
-        "database/trains.yaml";
+    const std::string filePath = trainFile;
 
-    const std::string tempPath =
-        "database/trains.tmp.yaml";
+    const std::string tempPath = tempTrainDatabase;
 
-    const std::string backupPath =
-        "database/trains.backup.yaml";
+    const std::string backupPath = backupTrainDatabase;
     
     // Validate user input
 

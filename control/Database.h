@@ -20,7 +20,8 @@ public:
     bool addTrack(const std::string& trackID);
 
 private:
-
+    std::string trainsDatabaseFile;
+    std::string loginDatabaseFile;
     bool validateDatabaseTrack(const std::string& filePath);
 
 };

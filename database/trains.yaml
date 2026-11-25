@@ -27,3 +27,7 @@ tracks:
     occupancy: free
     trainId: no_train
     signal: green
+  - id: Track4
+    occupancy: free
+    trainId: no_train
+    signal: green
