@@ -103,7 +103,7 @@ std::string* Train::trainServiceOption()
                 }
             }
         if(checker == 0){
-            std::cout << "\nInvalid input\n";
+            std::cerr << "\nInvalid input\n";
         } 
     } while (checker == 0);
   
@@ -154,7 +154,7 @@ void Train::addTrain(std::string id, std::string name, std::string destination){
 
         if (trainFound)
         {
-            std::cout << "This ID alreay exist.\n";
+            std::cerr << "This ID alreay exist.\n";
             return;
         }
         else if(!trainFound){
@@ -241,7 +241,7 @@ void Train::deleteTrain(std::string enteredValue_id){
 
         if (!trainFound)
         {
-            std::cout << "This ID does not exist.\n";
+            std::cerr << "This ID does not exist.\n";
             return;
         }
 
@@ -304,7 +304,7 @@ void Train::updateTrain(std::string enteredValue_id)
                 }
                 else
                 {
-                    std::cout << "This option is not available.\n";
+                    std::cerr << "This option is not available.\n";
                     break;
                 }
                 std::ofstream fout("database/trains.yaml");
@@ -320,7 +320,7 @@ void Train::updateTrain(std::string enteredValue_id)
 
         if (!trainFound)
         {
-            std::cout << "This ID does not exist.\n";
+            std::cerr << "This ID does not exist.\n";
             return;
         }
 
@@ -400,15 +400,15 @@ void Train::search(std::string enteredValue, std::string searchParams){
         if (!trainFound)
         {
             if(searchParams == "I"){
-                std::cout << "This ID does not exist.\n";
+                std::cerr << "This ID does not exist.\n";
                 return;
             }
             if(searchParams == "N"){
-                std::cout << "This Train Name does not exist.\n";
+                std::cerr << "This Train Name does not exist.\n";
                 return;
             }
             if(searchParams == "D"){
-                std::cout << "This Destination does not exist.\n";
+                std::cerr << "This Destination does not exist.\n";
                 return;
             }
             return;  

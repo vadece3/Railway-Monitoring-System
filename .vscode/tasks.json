@@ -5,6 +5,7 @@
             "label": "C/C++: cl.exe build active file",
             "command": "cl.exe",
             "args": [
+                "/std:c++17",
                 "/Zi",
                 "/EHsc",
                 "/nologo",
@@ -15,6 +16,7 @@
                 "${workspaceFolder}\\control\\Service.cpp",
                 "${workspaceFolder}\\control\\Track.cpp",
                 "${workspaceFolder}\\control\\Signal.cpp",
+                "${workspaceFolder}\\control\\Database.cpp",
 
                 "/Fe${workspaceFolder}\\main.exe",
 

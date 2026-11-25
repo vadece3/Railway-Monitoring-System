@@ -8,9 +8,6 @@ trains:
   - id: hg
     name: gh
     destination: hj
-  - id: hg
-    name: ghdf
-    destination: hje
   - id: df 4
     name: ss 4
     destination: s
@@ -26,8 +23,7 @@ tracks:
     occupancy: occupied
     trainId: hg
     signal: red
-  - id: Track4
+  - id: Track3
     occupancy: free
     trainId: no_train
     signal: green
-    occupency: occupied

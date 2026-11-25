@@ -6,6 +6,8 @@
 class Service{
     public:  
         std::string selectService();
+
+    private:
         std::string getSelectedService();
         std::string selectedService;
 

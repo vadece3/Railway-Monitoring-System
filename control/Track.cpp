@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
 #include "Track.h"
+#include "Database.h"
 #include <iomanip>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+
 
 std::string* Track::trackServiceOption()
 {
@@ -97,7 +99,7 @@ std::string* Track::trackServiceOption()
                         }
                         else
                         {
-                            std::cout << "This option is not available.\n";
+                            std::cerr << "This option is not available.\n";
                         }
                     }
                     if(selectedService == "exit"){
@@ -107,7 +109,7 @@ std::string* Track::trackServiceOption()
                 }
             }
         if(checker == 0){
-            std::cout << "\nInvalid input\n";
+            std::cerr << "\nInvalid input\n";
         } 
     } while (checker == 0);
   
@@ -137,53 +139,44 @@ std::string Track::trackgetSelectedService(){
 
 }
 
-//adding new train
+//adding new track
 void Track::addTrack(std::string id){
-    std::string occupancy = "free";
-    std::string trainId = "no_train";
-    std::string signal = "green";
-    try
+    std::string enteredValue_username;
+    std::string enteredValue_password;
+
+    std::cout << "You must login to add a Track\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_username);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_password);
+
+    Database database;
+    bool logedin = database.authenticateUser(enteredValue_username, enteredValue_password);
+
+    if (!logedin)
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
-        YAML::Node track;
-
-        bool trackFound = false;
-
-        for (auto track : root["tracks"])
-        {
-            if (track["id"].as<std::string>() == id)
-            {
-                trackFound = true;
-                break;
-            }
-        }
-
-        if (trackFound)
-        {
-            std::cout << "This ID alreay exist.\n";
-            return;
-        }
-        else if(!trackFound){
-            
-            track["id"] = id;
-            track["occupancy"] = occupancy;
-            track["trainId"] = trainId;
-            track["signal"] = signal;
-
-            root["tracks"].push_back(track);
-                
-            std::ofstream fout("database/trains.yaml");
-
-            fout << root;
-            fout.close();
-
-            std::cout << "\n\nTRACK REGISTERED SUCCESSFULLY!!\n\n";
-        }
+        std::cerr << "Track details update rejected.\n";
+        return;
     }
-    catch (const YAML::Exception& e)
+
+    std::cout << "Login Successfull.\n";
+    bool addTrack = database.addTrack(id);
+    
+    if (addTrack)
     {
-        std::cerr << "YAML error: " << e.what() << '\n';
+        std::cout << "Track was successfully added\n";
+        return;
     }
+    if (!addTrack)
+    {
+        std::cerr << "Failed to add Track\n";
+        return;
+    }  
 }
 
 //viewing all tracks
@@ -220,204 +213,85 @@ void Track::viewTrack(){
     }
 }
 
-//deleting track with respect to the train ID
+//deleting track with respect to the track ID
 void Track::deleteTrack(std::string enteredValue_id){
 
-    YAML::Node root = YAML::LoadFile("database/trains.yaml");
+    std::string enteredValue_username;
+    std::string enteredValue_password;
 
-    YAML::Node updated(YAML::NodeType::Sequence);
+    std::cout << "You must login to delete a Track\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
 
-    try
+    std::getline(std::cin >> std::ws, enteredValue_username);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_password);
+
+    Database database;
+    bool logedin = database.authenticateUser(enteredValue_username, enteredValue_password);
+
+    if (!logedin)
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
-
-        bool trackFound = false;
-
-        for (auto track : root["tracks"])
-        {
-            if (track["id"].as<std::string>() == enteredValue_id)
-            {
-                trackFound = true;
-                for (const auto& track : root["tracks"])
-                {
-                    if (track["id"].as<std::string>() != enteredValue_id)
-                    {
-                        updated.push_back(track);
-                    }
-                }
-                break;
-            }
-        }
-
-        if (!trackFound)
-        {
-            std::cout << "This ID does not exist.\n";
-            return;
-        }
-
-        root["tracks"] = updated;
-
-        std::ofstream fout("database/trains.yaml");
-        fout << root;
-        fout.close();
+        std::cerr << "Track details update rejected.\n";
+        return;
     }
-    catch (const YAML::Exception& e)
+
+    std::cout << "Login Successfull.\n";
+    bool deleteTrack = database.deleteTrack(enteredValue_id);
+    
+    if (deleteTrack)
     {
-        std::cerr << "YAML error: " << e.what() << '\n';
+        std::cout << "Track was successfully deleted\n";
+        return;
+    }
+    if (!deleteTrack)
+    {
+        std::cerr << "Failed to delete Track\n";
+        return;
     }
 }
 
-//updating track by searching the train ID
+//updating track by searching the track ID
 void Track::updateTrack(std::string enteredValue_id)
 {
-    std::string enteredValue_item;
-    std::string newValue_occupency;
-    std::string newValue_trainId;
-    std::string newValue_id;
+    std::string enteredValue_username;
+    std::string enteredValue_password;
 
-    try
+    std::cout << "You must login to update\n";
+    std::cout << "Enter username\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_username);
+
+    std::cout << "Enter password\n";
+    std::cout << "-> ";
+
+    std::getline(std::cin >> std::ws, enteredValue_password);
+
+    Database database;
+    bool logedin = database.authenticateUser(enteredValue_username, enteredValue_password);
+
+    if (!logedin)
     {
-        YAML::Node root = YAML::LoadFile("database/trains.yaml");
-
-        bool trackFound = false;
-
-        for (auto track : root["tracks"])
-        {
-            if (track["id"].as<std::string>() == enteredValue_id)
-            {
-                trackFound = true;
-
-                std::cout << "1. Update Track Occupancy (Enter O)\n";
-                std::cout << "2. Exit (Enter exit)\n";
-                std::cout << "-> ";
-
-                std::getline(std::cin >> std::ws, enteredValue_item);
-
-                if (enteredValue_item == "O")
-                {
-                    
-
-                    std::cout << "Set New occupency (Enter letter \"O\" to Occupy the track and \"R\" to Release the track):\n->  ";
-                    std::getline(std::cin >> std::ws, newValue_occupency);
-
-                    if(newValue_occupency == "R"){
-                        track["occupency"] = "free";
-                        track["trainId"] = "no_train";
-                        track["signal"] = "green";
-                        
-                        std::ofstream fout("database/trains.yaml");
-
-                        fout << root;
-                        fout.close();
-
-                        std::cout << "\nTrack successfully updated!\n";
-
-                        break;     
-                    }
-                    if(newValue_occupency == "O"){
-                        std::cout << "Enter Train Id:\n-> ";
-                        std::getline(std::cin >> std::ws, newValue_trainId);
-
-                        //check if the train id exist in train list
-                        YAML::Node roottrain = YAML::LoadFile("database/trains.yaml");
-
-                        bool trainFound = false;
-
-                        for (auto train : roottrain["trains"])
-                        {
-                            if (train["id"].as<std::string>() == newValue_trainId)
-                            {
-                                trainFound = true;
-                                break;
-                            }
-                        }
-
-                        if (trainFound)
-                        {
-                            //check if the train id is already on a track. If it is, delete from that track and set to this track
-                            bool trainTrackFound = false;
-                            for (auto track1 : root["tracks"])
-                            {
-                                if (track1["trainId"].as<std::string>() == newValue_trainId)
-                                {
-                                    trainTrackFound = true;
-
-                                    std::string yesorno;
-                                    std::cout << "This train ID is already on a track. Do you want to set it on this track?\n";
-                                    std::cout << "Enter Y for yes and N for no \n->";
-                                    std::cin >> yesorno;
-                                    
-                                    if(yesorno == "Y"){
-                                        //delete train id from old track
-                                        track1["occupancy"] = "free";
-                                        track1["trainId"] = "no_train";
-                                        track1["signal"] = "green";
-
-                                        //set train id on new track
-                                        track["occupancy"] = "occupied";
-                                        track["trainId"] = newValue_trainId;
-                                        track["signal"] = "red";
-                                        
-                                        std::ofstream fout("database/trains.yaml");
-
-                                        fout << root;
-                                        fout.close();
-
-                                        std::cout << "\nTrack successfully updated!\n";
-
-                                        return;
-                                    }
-                                    else if(yesorno == "N"){
-                                        return;
-                                    }
-                                    else{
-                                        std::cout << "Wrong option \n->";
-                                        return; 
-                                    }
-                                }
-                            }
-                            if(!trainTrackFound){
-                                track["occupancy"] = "occupied";
-                                track["trainId"] = newValue_trainId;
-                                track["signal"] = "red";
-                                
-                                std::ofstream fout("database/trains.yaml");
-
-                                fout << root;
-                                fout.close();
-
-                                std::cout << "\nTrack successfully updated!\n";
-
-                                break;
-                            }  
-                        }
-                        if(!trainFound){
-                            std::cout << "\nTrain Id not found in Train list\n";
-                            return;
-                        }
-                    }
-                }
-                else if (enteredValue_item == "exit")
-                {
-                    return;
-                }
-                else
-                {
-                    std::cout << "This option is not available.\n";
-                    break;
-                }
-            }
-        }
-
-        if (!trackFound)
-        {
-            std::cout << "This ID does not exist.\n";
-            return;
-        }
+        std::cerr << "Track details update rejected.\n";
+        return;
     }
-    catch (const YAML::Exception& e)
+
+    std::cout << "Login Successfull.\n";
+    bool updateTrackOccupancy = database.updateTrackOccupancy(enteredValue_id);
+    
+    if (updateTrackOccupancy)
     {
-        std::cerr << "YAML error: " << e.what() << '\n';
+        std::cout << "Track details was successfully updated\n";
+        return;
+    }
+    if (!updateTrackOccupancy)
+    {
+        std::cerr << "Track details failed to update\n";
+        return;
     }
 }
 
@@ -448,11 +322,6 @@ void Track::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << track["occupancy"].as<std::string>()
                         << std::setw(colWidth) << track["trainId"].as<std::string>()
                         << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                    std::ofstream fout("database/trains.yaml");
-
-                    fout << root;
-                    fout.close();
                 }
             }
             if(searchParams == "O"){
@@ -465,11 +334,6 @@ void Track::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << track["occupancy"].as<std::string>()
                         << std::setw(colWidth) << track["trainId"].as<std::string>()
                         << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                    std::ofstream fout("database/trains.yaml");
-
-                    fout << root;
-                    fout.close();
                 }
             }
             if(searchParams == "S"){
@@ -482,11 +346,6 @@ void Track::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << track["occupancy"].as<std::string>()
                         << std::setw(colWidth) << track["trainId"].as<std::string>()
                         << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                    std::ofstream fout("database/trains.yaml");
-
-                    fout << root;
-                    fout.close();
                 }
             }
             if(searchParams == "T"){
@@ -499,11 +358,6 @@ void Track::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << track["occupancy"].as<std::string>()
                         << std::setw(colWidth) << track["trainId"].as<std::string>()
                         << std::setw(colWidth) << track["signal"].as<std::string>() << "\n";
-
-                    std::ofstream fout("database/trains.yaml");
-
-                    fout << root;
-                    fout.close();
                 }
             }
         }
@@ -511,19 +365,19 @@ void Track::search(std::string enteredValue, std::string searchParams){
         if (!trackFound)
         {
             if(searchParams == "I"){
-                std::cout << "This ID does not exist.\n";
+                std::cerr << "This ID does not exist.\n";
                 return;
             }
             if(searchParams == "O"){
-                std::cout << "This Track Occupation does not exist.\n";
+                std::cerr << "This Track Occupation does not exist.\n";
                 return;
             }
             if(searchParams == "S"){
-                std::cout << "This Signal does not exist.\n";
+                std::cerr << "This Signal does not exist.\n";
                 return;
             }
             if(searchParams == "T"){
-                std::cout << "This Train Id does not exist.\n";
+                std::cerr << "This Train Id does not exist.\n";
                 return;
             }
             return;  

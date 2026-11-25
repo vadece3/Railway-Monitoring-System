@@ -19,7 +19,7 @@ std::string Service::selectService(){
                 }
             }
         if(checker == 0){
-            std::cout << "\nInvalid input\n";
+            std::cerr << "\nInvalid input\n";
         } 
     } while (checker == 0);
     
