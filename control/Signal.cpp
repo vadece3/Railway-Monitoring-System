@@ -17,6 +17,7 @@ std::string* Signal::signalServiceOption()
     std::string enteredValue_id;
     Signal::selectedService;
     int checker = 0;
+    int invalidInputChecker = 1;
     std::string const signalOptions[5] = {"A", "R", "G","S" , "exit"};//enter the letters which will be checked after user has enterd the letter
     
     do
@@ -26,6 +27,9 @@ std::string* Signal::signalServiceOption()
         for (int i = 0; i <  sizeof(signalOptions) / sizeof(signalOptions[0]); i++)
             {
                 if(selectedService == signalOptions[i]){
+
+                    invalidInputChecker = 0;
+                        
                     if(selectedService == "A"){
                         viewAllSignalOccupancy();
                     }
@@ -44,11 +48,13 @@ std::string* Signal::signalServiceOption()
                         checker = 1;
                         break;
                     }
+                    break;
                 }
             }
-        if(checker == 0){
+        if(checker == 0 && invalidInputChecker == 1){
             std::cerr << "\nInvalid input\n";
-        } 
+        }
+        invalidInputChecker = 1; 
     } while (checker == 0);
   
    std::string* pointerOfSelectedService = &selectedService; //points to the memory address of the value of selectedService

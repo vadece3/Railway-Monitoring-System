@@ -23,6 +23,7 @@ std::string* Track::trackServiceOption()
     std::string enteredValue;
     Track::selectedService;
     int checker = 0;
+    int invalidInputChecker = 1;
     std::string const trackOptions[6] = {"C", "R", "U", "D", "S", "exit"};//enter the letters which will be checked after user has enterd the letter
     
     do
@@ -33,6 +34,9 @@ std::string* Track::trackServiceOption()
         for (int i = 0; i <  sizeof(trackOptions) / sizeof(trackOptions[0]); i++)
             {
                 if(selectedService == trackOptions[i]){
+
+                    invalidInputChecker = 0;
+                        
                     if(selectedService == "C"){
                         std::cout << "\nEnter Track ID: ";
                         std::getline(std::cin >> std::ws, enteredValue_id);
@@ -107,11 +111,13 @@ std::string* Track::trackServiceOption()
                         checker = 1;
                         break;
                     }
+                    break;
                 }
             }
-        if(checker == 0){
+        if(checker == 0 && invalidInputChecker == 1){
             std::cerr << "\nInvalid input\n";
-        } 
+        }
+        invalidInputChecker = 1;
     } while (checker == 0);
   
    std::string* pointerOfSelectedService = &selectedService; //points to the memory address of the value of selectedService

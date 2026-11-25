@@ -5,6 +5,7 @@
 #include "control/Train.h"
 #include "control/Track.h"
 #include "control/Signal.h"
+#include "control/User.h"
 
 int main()
 {
@@ -25,6 +26,7 @@ int main()
     Train trainService;
     Track trackService;
     Signal signalService;
+    User userService;
     int mainChecker = 0;
 
     do
@@ -56,6 +58,13 @@ int main()
         {
             std::string trackResult = trackService.trackStatusChange();
             if(trackResult == "exit"){
+                continue;
+            }
+        }
+        else if (selectedService == "U")
+        {
+            std::string userUpdates = userService.userUpdates();
+            if(userUpdates == "exit"){
                 continue;
             }
         }

@@ -22,6 +22,7 @@ std::string* Train::trainServiceOption()
     std::string enteredValue;
     Train::selectedService;
     int checker = 0;
+    int invalidInputChecker = 1;
     std::string const trainOptions[6] = {"C", "R", "U", "D", "S", "exit"};//enter the letters which will be checked after user has enterd the letter
     
     do
@@ -32,6 +33,9 @@ std::string* Train::trainServiceOption()
         for (int i = 0; i <  sizeof(trainOptions) / sizeof(trainOptions[0]); i++)
             {
                 if(selectedService == trainOptions[i]){
+
+                    invalidInputChecker = 0;
+                        
                     if(selectedService == "C"){
                         std::cout << "\nEnter Train ID: ";
                         std::getline(std::cin >> std::ws, enteredValue_id);
@@ -102,11 +106,13 @@ std::string* Train::trainServiceOption()
                         checker = 1;
                         break;
                     }
+                    break;
                 }
             }
-        if(checker == 0){
+        if(checker == 0 && invalidInputChecker == 1){
             std::cerr << "\nInvalid input\n";
-        } 
+        }
+        invalidInputChecker = 1; 
     } while (checker == 0);
   
    std::string* pointerOfSelectedService = &selectedService; //points to the memory address of the value of selectedService
@@ -332,11 +338,6 @@ void Train::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << train["id"].as<std::string>()
                         << std::setw(colWidth) << train["name"].as<std::string>()
                         << std::setw(colWidth) << train["destination"].as<std::string>() << "\n";
-
-                    std::ofstream fout(trainFile);
-
-                    fout << root;
-                    fout.close();
                 }
             }
             if(searchParams == "N"){
@@ -348,11 +349,6 @@ void Train::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << train["id"].as<std::string>()
                         << std::setw(colWidth) << train["name"].as<std::string>()
                         << std::setw(colWidth) << train["destination"].as<std::string>() << "\n";
-
-                    std::ofstream fout(trainFile);
-
-                    fout << root;
-                    fout.close();
                 }
             }
             if(searchParams == "D"){
@@ -364,11 +360,6 @@ void Train::search(std::string enteredValue, std::string searchParams){
                         << std::setw(colWidth) << train["id"].as<std::string>()
                         << std::setw(colWidth) << train["name"].as<std::string>()
                         << std::setw(colWidth) << train["destination"].as<std::string>() << "\n";
-
-                    std::ofstream fout(trainFile);
-
-                    fout << root;
-                    fout.close();
                 }
             }
         }

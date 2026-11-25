@@ -12,6 +12,9 @@ public:
     bool authenticateUser(const std::string& username,const std::string& password);
     bool authorizeAdmin(const std::string& username,const std::string& password);
 
+    bool addNewUser(const std::string& username, const std::string& userpassword);
+    bool deleteUser(const std::string& username);
+
     //Track
     bool updateTrackOccupancy(const std::string& trackID);
     bool deleteTrack(const std::string& trackID);
@@ -27,6 +30,7 @@ private:
     std::string loginDatabaseFile;
     bool validateDatabaseTrack(const std::string& filePath);
     bool validateDatabaseTrain(const std::string& filePath);
+    bool validateDatabaseLogin(const std::string& filePath);
 
 };
 

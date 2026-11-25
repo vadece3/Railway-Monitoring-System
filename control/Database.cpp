@@ -1372,3 +1372,368 @@ bool Database::addTrain(const std::string& trainID, const std::string& name, con
 
     return false;
 }
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+// USER
+////////////////////////////////////////////////////////////////////////////////////
+
+// ------------------------------------------
+//  TAINS:  DATABASE VALIDATION
+// ------------------------------------------
+/*
+This function checks whether the existing YAML database contains valid and consistent train information.
+The purpose is to prevent your application from working with malformed or inconsistent railway data.
+*/
+bool Database::validateDatabaseLogin(
+    const std::string& filePath)
+{
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+
+        if (!root["Users"] ||
+            !root["Users"].IsSequence())
+        {
+            std::cerr << "Invalid database structure.\n";
+            return false;
+        }
+
+        /*
+        std::unordered_set: 
+        Key properties:
+        No duplicates: If you insert the same string twice, only one copy is stored.
+        Unordered: The elements are not stored in any particular order; iteration order is not guaranteed.
+        Fast lookups: Uses hashing internally, so find() and insert() are typically O(1) on average.
+        */
+        std::unordered_set<std::string> userNames;
+
+        for (const auto& user : root["Users"])
+        {
+            if (!user.IsMap() ||
+                !user["username"] ||
+                !user["password"] )
+            {
+                std::cerr << "Missing user information.\n";
+                return false;
+            }
+
+            std::string username =
+                user["username"].as<std::string>();
+
+            // Prevent duplicate track IDs.
+            if (username.empty() ||
+                !userNames.insert(username).second)
+            {
+                std::cerr << "Invalid or duplicate Username.\n";
+                return false;
+            }
+        }
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "Database validation error: "
+                  << e.what() << '\n';
+
+        return false;
+    }
+}
+
+bool Database::deleteUser(const std::string& username){
+    
+    //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to delete data to database.\n";
+        return false;
+    }
+    std::string loginFile = Configuration::loginDatabase;
+    std::string tempLoginDatabase = Configuration::tempLoginDatabase;
+    std::string backupLoginDatabase = Configuration::backupLoginDatabase;
+    
+    std::lock_guard<std::mutex> lock(databaseMutex);
+
+    const std::string filePath = loginFile;
+
+    const std::string tempPath = tempLoginDatabase;
+
+    const std::string backupPath = backupLoginDatabase;
+    
+    // Validate user input
+
+    if (username.empty())
+    {
+        std::cerr << "Invalid user Name.\n";
+        return false;
+    }
+
+    // Validate existing database
+
+    if (!validateDatabaseLogin(filePath))
+    {
+        std::cerr << "Existing database is invalid.\n";
+        return false;
+    }
+
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+        YAML::Node updated(YAML::NodeType::Sequence);
+
+        bool usernameFound = false;
+
+        //Find and update the requested track
+        for (auto user : root["Users"])
+        {
+            if (user["username"].as<std::string>() == username)
+            {
+                usernameFound = true;
+
+                for (const auto& user : root["Users"])
+                {
+                    if (user["username"].as<std::string>() != username)
+                    {
+                        updated.push_back(user);
+                    }
+                }
+                break;
+            }
+        }
+
+        if (!usernameFound)
+        {
+            std::cerr << "Username not found.\n";
+            return false;
+        }
+
+        // Save changes to a temporary file
+        {
+            std::ofstream fout(tempPath);
+
+            if (!fout.is_open())
+            {
+                std::cerr << "Cannot create temporary database.\n";
+                return false;
+            }
+
+            root["Users"] = updated;
+            fout << root;
+            fout.flush();
+
+            if (!fout.good())
+            {
+                fout.close();
+                fs::remove(tempPath);
+
+                std::cerr << "Failed to write temporary database.\n";
+                return false;
+            }
+        }
+
+        // Validate the modified database
+        if (!validateDatabaseLogin(tempPath))
+        {
+            fs::remove(tempPath);
+
+            std::cerr << "Updated database failed validation.\n";
+            return false;
+        }
+
+        //Backup original database
+        if (fs::exists(backupPath))
+        {
+            fs::remove(backupPath);
+        }
+
+        fs::rename(filePath, backupPath);
+
+        //Replace original database
+        try
+        {
+            fs::rename(tempPath, filePath);
+        }
+        catch (...)
+        {
+            // Restore original database if replacement fails.
+            fs::rename(backupPath, filePath);
+            throw;
+        }
+
+        //Remove backup after successful replacement
+        fs::remove(backupPath);
+
+        std::cout << "\nDatabase updated successfully!\n";
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "YAML error: "
+                  << e.what() << '\n';
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        std::cerr << "File operation error: "
+                  << e.what() << '\n';
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Database update error: "
+                  << e.what() << '\n';
+    }
+
+    // Remove an incomplete temporary file.
+    std::error_code error;
+    fs::remove(tempPath, error);
+
+    return false;
+}
+
+
+bool Database::addNewUser(const std::string& username, const std::string& userpassword){
+
+     //set database file path
+    if (!Configuration::loadConfig())
+    {
+        std::cerr << "Config Data Failure: Unable to add data to database.\n";
+        return false;
+    }
+    std::string loginFile = Configuration::loginDatabase;
+    std::string tempLoginDatabase = Configuration::tempLoginDatabase;
+    std::string backupLoginDatabase = Configuration::backupLoginDatabase;
+
+    
+    std::lock_guard<std::mutex> lock(databaseMutex);
+
+    const std::string filePath = loginFile;
+
+    const std::string tempPath = tempLoginDatabase;
+
+    const std::string backupPath = backupLoginDatabase;
+    
+    // Validate user input
+
+    if (username.empty() || userpassword.empty())
+    {
+        std::cerr << "The username and password should not be empty.\n";
+        return false;
+    }
+
+    // Validate existing database
+    if (!validateDatabaseLogin(filePath))
+    {
+        std::cerr << "Existing database is invalid.\n";
+        return false;
+    }
+
+    try
+    {
+        YAML::Node root = YAML::LoadFile(filePath);
+        YAML::Node user;
+
+        bool usernameFound = false;
+
+        //Find and update the requested username
+        for (auto user : root["Users"])
+        {
+            if (user["username"].as<std::string>() == username)
+            {
+                usernameFound = true;
+                break;
+            }
+        }
+
+        if (usernameFound)
+        {
+            std::cerr << "Username already exist.\n";
+            return false;
+        }
+        else if(!usernameFound)// Save changes to a temporary file
+        {
+            std::ofstream fout(tempPath);
+
+            if (!fout.is_open())
+            {
+                std::cerr << "Cannot create temporary database.\n";
+                return false;
+            }
+
+            user["username"] = username;
+            user["password"] = userpassword;
+            user["role"] = "user";
+
+            root["Users"].push_back(user);
+            
+            fout << root;
+            fout.flush();
+
+            if (!fout.good())
+            {
+                fout.close();
+                fs::remove(tempPath);
+
+                std::cerr << "Failed to write temporary database.\n";
+                return false;
+            }
+        }
+
+        // Validate the modified database
+        if (!validateDatabaseLogin(tempPath))
+        {
+            fs::remove(tempPath);
+
+            std::cerr << "Updated database failed validation.\n";
+            return false;
+        }
+
+        //Backup original database
+        if (fs::exists(backupPath))
+        {
+            fs::remove(backupPath);
+        }
+
+        fs::rename(filePath, backupPath);
+
+        //Replace original database
+        try
+        {
+            fs::rename(tempPath, filePath);
+        }
+        catch (...)
+        {
+            // Restore original database if replacement fails.
+            fs::rename(backupPath, filePath);
+            throw;
+        }
+
+        //Remove backup after successful replacement
+        fs::remove(backupPath);
+
+        std::cout << "\nDatabase updated successfully!\n";
+
+        return true;
+    }
+    catch (const YAML::Exception& e)
+    {
+        std::cerr << "YAML error: "
+                  << e.what() << '\n';
+    }
+    catch (const fs::filesystem_error& e)
+    {
+        std::cerr << "File operation error: "
+                  << e.what() << '\n';
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << "Database update error: "
+                  << e.what() << '\n';
+    }
+
+    // Remove an incomplete temporary file.
+    std::error_code error;
+    fs::remove(tempPath, error);
+
+    return false;
+}
