@@ -7,6 +7,12 @@
 
 std::string* Train::trainServiceOption()
 {
+    std::cout << "====================================\n";
+    std::cout << "      RAILWAY MONITORING SYSTEM\n";
+    std::cout << "====================================\n\n";
+    
+    std::cout << "SERVICE: Train Settings\n";
+    std::cout << "============================================\n\n";
     std::string enteredValue_id;
     std::string enteredValue_name;
     std::string enteredValue_destination;
@@ -94,10 +100,11 @@ std::string* Train::trainServiceOption()
                         checker = 1;
                         break;
                     }
-                }else {
-                        std::cout << "\nInvalid input\n" ;
-                    }
+                }
             }
+        if(checker == 0){
+            std::cout << "\nInvalid input\n";
+        } 
     } while (checker == 0);
   
    std::string* pointerOfSelectedService = &selectedService; //points to the memory address of the value of selectedService

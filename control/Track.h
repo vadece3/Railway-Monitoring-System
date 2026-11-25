@@ -8,6 +8,7 @@ class Track
 public:
     std::string* trackServiceOption(); //pointer function
     std::string trackgetSelectedService();
+    std::string trackStatusChange();
 
     void addTrack(std::string enteredValue_id);
     void viewTrack();

@@ -18,7 +18,10 @@ It will simulate a simple railway monitoring system that allows a user to:
 4. Detect occupied tracks.(done)
 5. Prevent two trains from using the same track.(done)
 6. Prevent two tracks from being used by the same train.(done)
-7. Display a railway system overview.
+7. Display a railway system overview.(done)
+
+#Security#
+8. Secure Database by giving controled access
 
 ====================================
        Requirements To Run
@@ -103,28 +106,7 @@ Select the service you want to use by entering the coresponding letter:
 
 
 4. Occupy a track and Release a track
-5. Display signal status
-6. Display system overview
-
-Choose an option: 1
-
-Enter train ID: ICE101
-Enter train name: ICE Express
-
-Train successfully registered!
-
-------------------------------------
-TRACK STATUS
-------------------------------------
-Track A: FREE
-Track B: OCCUPIED
-Track C: FREE
-
-SIGNAL STATUS
-------------------------------------
-Signal A: GREEN
-Signal B: RED
-Signal C: GREEN
+5. Exit
 
 
  

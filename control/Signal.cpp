@@ -7,6 +7,12 @@
 
 std::string* Signal::signalServiceOption()
 {
+    std::cout << "====================================\n";
+    std::cout << "      RAILWAY MONITORING SYSTEM\n";
+    std::cout << "====================================\n\n";
+    
+    std::cout << "SERVICE: Display signal status (RED or GREEN)\n";
+    std::cout << "============================================\n\n";
     std::string enteredValue_id;
     Signal::selectedService;
     int checker = 0;
@@ -37,10 +43,11 @@ std::string* Signal::signalServiceOption()
                         checker = 1;
                         break;
                     }
-                }else {
-                        std::cout << "\nInvalid input\n" ;
-                    }
+                }
             }
+        if(checker == 0){
+            std::cout << "\nInvalid input\n";
+        } 
     } while (checker == 0);
   
    std::string* pointerOfSelectedService = &selectedService; //points to the memory address of the value of selectedService

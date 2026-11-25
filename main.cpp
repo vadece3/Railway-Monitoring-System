@@ -52,6 +52,13 @@ int main()
                 continue;
             }
         }
+        else if (selectedService == "O")
+        {
+            std::string trackResult = trackService.trackStatusChange();
+            if(trackResult == "exit"){
+                continue;
+            }
+        }
         else if (selectedService == "exit")
         {
             mainChecker = 1;

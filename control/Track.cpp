@@ -7,6 +7,12 @@
 
 std::string* Track::trackServiceOption()
 {
+    std::cout << "====================================\n";
+    std::cout << "      RAILWAY MONITORING SYSTEM\n";
+    std::cout << "====================================\n\n";
+    
+    std::cout << "SERVICE: Track Settings\n";
+    std::cout << "============================================\n\n";
     std::string enteredValue_id;
     std::string enteredValue_name;
     std::string enteredValue_destination;
@@ -98,10 +104,11 @@ std::string* Track::trackServiceOption()
                         checker = 1;
                         break;
                     }
-                }else {
-                        std::cout << "\nInvalid input\n" ;
-                    }
+                }
             }
+        if(checker == 0){
+            std::cout << "\nInvalid input\n";
+        } 
     } while (checker == 0);
   
    std::string* pointerOfSelectedService = &selectedService; //points to the memory address of the value of selectedService
@@ -280,8 +287,7 @@ void Track::updateTrack(std::string enteredValue_id)
             {
                 trackFound = true;
 
-                std::cout << "\n------ What do you want to update? ------\n";
-                std::cout << "1. Track Occupency (Enter O)\n";
+                std::cout << "1. Update Track Occupancy (Enter O)\n";
                 std::cout << "2. Exit (Enter exit)\n";
                 std::cout << "-> ";
 
@@ -291,10 +297,10 @@ void Track::updateTrack(std::string enteredValue_id)
                 {
                     
 
-                    std::cout << "Set New occupency (Enter letter \"O\" for occupied and \"F\" for free):\n->  ";
+                    std::cout << "Set New occupency (Enter letter \"O\" to Occupy the track and \"R\" to Release the track):\n->  ";
                     std::getline(std::cin >> std::ws, newValue_occupency);
 
-                    if(newValue_occupency == "F"){
+                    if(newValue_occupency == "R"){
                         track["occupency"] = "free";
                         track["trainId"] = "no_train";
                         track["signal"] = "green";
@@ -527,5 +533,37 @@ void Track::search(std::string enteredValue, std::string searchParams){
     {
         std::cerr << "YAML error: " << e.what() << '\n';
     }
+
+}
+
+std::string Track::trackStatusChange(){
+    std::cout << "====================================\n";
+    std::cout << "      RAILWAY MONITORING SYSTEM\n";
+    std::cout << "====================================\n\n";
+    
+    std::cout << "SERVICE: Occupy a track and Release a track\n";
+    std::cout << "============================================\n\n";
+    std::string enteredValue_id;
+    int checker = 0;
+    
+    do
+    {
+        viewTrack();
+
+        std::cout << "\n------ Enter Track ID or enter exit to quit------\n";
+        std::cout << "-> ";
+        std::getline(std::cin >> std::ws, enteredValue_id);
+        
+        if(enteredValue_id == "exit"){
+                checker = 1;
+                break;
+        }
+        else {
+            updateTrack(enteredValue_id);
+        }
+
+    }while(checker == 0);
+    
+    return enteredValue_id;
 
 }
