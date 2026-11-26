@@ -1,4 +1,5 @@
 
 .vscode/
 vcpkg/
+download/
 app.config

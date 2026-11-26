@@ -29,7 +29,7 @@ std::string User::userUpdates()
     
 
     // only admin can access
-    std::cout << "You must login to access user settings\n";
+    std::cout << "You must login as Admin to access user settings\n";
     std::cout << "Enter username\n";
     std::cout << "-> ";
 
