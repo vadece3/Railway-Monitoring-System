@@ -1,6 +1,6 @@
 
 .vscode/
 vcpkg/
-download/
+database/
 app.config
 
