@@ -1,0 +1,30 @@
+trains:
+  - id: T001
+    name: ICE Berlin
+    destination: Berlin
+  - id: T002
+    name: ICE Hamburg
+    destination: Hamburg
+  - id: hg
+    name: gh
+    destination: hj
+  - id: T003
+    name: RB Goslar
+    destination: Hannover
+tracks:
+  - id: Track1
+    occupancy: occupied
+    trainId: T001
+    signal: red
+  - id: Track2
+    occupancy: occupied
+    trainId: hg
+    signal: red
+  - id: Track3
+    occupancy: free
+    trainId: no_train
+    signal: green
+  - id: Track4
+    occupancy: free
+    trainId: no_train
+    signal: green
