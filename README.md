@@ -105,6 +105,9 @@ Then enter in .../Railway Monitoring System/vcpkg/ and run the following command
 After that you can run.
 
 
+====================================
+       Interface Example
+====================================
 
 Here is an example of the console interface:
 
