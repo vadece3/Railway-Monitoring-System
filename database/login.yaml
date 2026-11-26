@@ -1,7 +1,0 @@
-Users:
-  - username: admin
-    password: admin
-    role: admin
-  - username: test
-    password: test
-    role: user
